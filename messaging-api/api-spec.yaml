@@ -1,0 +1,143 @@
+swagger: '2.0'
+info:
+  version: '2017-07-15'
+  title: Messaging API
+  description: The Messaging API is used to query and set orders on the Loceth order book
+consumes: 
+  - 'application/json'
+produces:
+  - 'application/json'
+schemes:
+  - https
+securityDefinitions:
+  LocethSecurity:
+    type: apiKey
+    in: header
+    name: Authorization
+security:
+  - LocethSecurity: []
+paths:
+  "/messaging-api/threads":
+    get:
+      operationId: getThreads
+      description: Get the threads the user has partcipated in.
+      responses:
+        '200':
+          description: Success
+          schema:
+            title: ArrayOfThreads
+            type: array
+            items:
+              "$ref": "#/definitions/Thread"
+        '500':
+          description: Internal Server Error
+          schema:
+            "$ref": "#/definitions/Error"
+  "/messaging-api/threads/{to}":
+    get:
+      operationId: getMessages
+      description: Get a `thread`.
+      parameters:
+      - name: to
+        in: path
+        description: other party to the thread
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Success
+          schema:
+            title: ArrayOfMessages
+            type: array
+            items:
+              "$ref": "#/definitions/MessageWithId"
+        '500':
+          description: Internal Server Error
+          schema:
+            "$ref": "#/definitions/Error"
+    post:
+      operationId: sendMessage
+      description: Add a new `message` to a `thread`.
+      parameters:
+      - name: to
+        in: path
+        description: other party to the thread
+        required: true
+        type: string
+      - name: body
+        in: body
+        description: The listing
+        required: true
+        schema:
+          "$ref": "#/definitions/MessagePost"
+      responses:
+        '200':
+          description: Post successful
+          schema:
+            "$ref": "#/definitions/MessageId"
+        '400':
+          description: Bad Request
+          schema:
+            "$ref": "#/definitions/Error"
+        '500':
+          description: Internal Server Error
+definitions:
+  MessagePost:
+    type: object
+    properties:
+      encryptedText:
+        type: string
+        description: The encrypted text of the message
+      encryptedTextForSender:
+        type: string
+        description: The encrypted text of the message for the sender
+  MessageWithId:
+    type: object
+    properties:
+      id:
+        type: string
+        description: id of the `message`
+      from:
+        type: string
+        description: account sending the `message`
+      to:
+        type: string
+        description: account receiving the `message`
+      encryptedText:
+        type: string
+        description: encrypted text of the `message`
+      encryptedTextForSender:
+        type: string
+        description: encrypted text of the `message` (for the sender)
+      date:
+        type: string
+        description: the date the message was sent
+      listingId:
+        type: string
+        description: the id of the message
+  MessageId:
+    type: object
+    properties:
+      id:
+        type: string
+        description: id of the `message`
+  Thread:
+    type: object
+    properties:
+      count:
+        type: number
+        description: number of messages in the thread
+      counterparty:
+        type: string
+        description: the other person in the thread
+      lastUpdated:
+        type: string
+        description: the date of the last update to the thread
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string

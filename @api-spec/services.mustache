@@ -1,0 +1,178 @@
+/**
+* {{&summary}}
+* @method
+{{#externalDocs}}
+* @see {@link {{&url}}|{{#description}}{{&description}}{{/description}}{{^description}}External docs{{/description}}}
+{{/externalDocs}}
+* @name {{&className}}#{{&methodName}}
+{{#parameters}}
+    {{^isSingleton}} * @param {{=<% %>=}}{<%&type%>}<%={{ }}=%> {{&camelCaseName}} - {{&description}}{{/isSingleton}}
+{{/parameters}}
+*/
+public async {{&methodName}}(
+{{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}:{{> type}},
+{{/isSingleton}}{{/parameters}}
+){{#responses}}
+{{#200}}: Promise<{{#tsType}}{{=<% %>=}}<%#isRef%><%target%><%/isRef%><%!%><%#isAtomic%><%&tsType%><%/isAtomic%><%!%><%#isObject%>{<%#properties%><%name%>:<%>type%>;<%/properties%>}<%/isObject%><%!%><%#isArray%><%#elementType%><%>type%><%/elementType%>[]<%/isArray%><%={{ }}=%>{{/tsType}}>{{/200}}{{/responses}}
+{
+
+    let path = '{{&path}}';
+    let formBody: any;
+    let queryParameters: any = {};
+    let headers: any = {};
+    // headers['X-Loceth-Version'] = '2017-07-18';
+    headers.account = window.web3.eth.coinbase;
+{{#headers}}
+    headers['{{&name}}'] = {{&value}};
+{{/headers}}
+{{#parameters}}
+
+    {{#isQueryParameter}}
+        {{#isSingleton}}
+            queryParameters['{{&name}}'] = '{{&singleton}}';
+        {{/isSingleton}}
+        {{^isSingleton}}
+            {{#isPatternType}}
+                Object.keys(parameters).forEach(function(parameterName) {
+                    if(new RegExp('{{&pattern}}').test(parameterName)){
+                        queryParameters[parameterName] = parameters[parameterName];
+                    }
+                });
+            {{/isPatternType}}
+            {{^isPatternType}}
+                if({{&camelCaseName}} !== undefined){
+                    queryParameters['{{&name}}'] = {{&camelCaseName}};
+                }
+            {{/isPatternType}}
+        {{/isSingleton}}
+    {{/isQueryParameter}}
+
+    {{#isPathParameter}}
+        path = path.replace('{{=<% %>=}}{<%&name%>}<%={{ }}=%>', String({{&camelCaseName}}));
+    {{/isPathParameter}}
+
+    {{#isHeaderParameter}}
+        {{#isSingleton}}
+            headers['{{&name}}'] = '{{&singleton}}';
+        {{/isSingleton}}
+        {{^isSingleton}}
+            if({{&camelCaseName}} !== undefined){
+                headers['{{&name}}'] = {{&camelCaseName}};
+            }
+        {{/isSingleton}}
+    {{/isHeaderParameter}}
+
+    {{#isBodyParameter}}
+        if({{&camelCaseName}} !== undefined){
+            formBody = {{&camelCaseName}};
+        }
+    {{/isBodyParameter}}
+
+    {{#isFormParameter}}
+        {{#isSingleton}}
+            form['{{&name}}'] = '{{&singleton}}';
+        {{/isSingleton}}
+        {{^isSingleton}}
+            if({{&camelCaseName}} !== undefined){
+                form['{{&name}}'] = {{&camelCaseName}};
+            }
+        {{/isSingleton}}
+    {{/isFormParameter}}
+
+    {{#required}}
+        if({{&camelCaseName}} === undefined){
+            throw new Error('Missing required {{&paramType}} parameter: {{&camelCaseName}}');
+        }
+    {{/required}}
+
+{{/parameters}}
+
+const request = new Request(
+    `${this.protocol}://${this.domain}:${this.port}${path}?${qs.stringify(queryParameters)}`,
+    {
+        method: '{{method}}',
+        headers,
+        body: JSON.stringify(formBody)
+    }
+);
+const response = await fetch(request);
+{{#responses}}
+{{#200}}
+if(response.status === 200){
+    const responseObject = await response.json();
+    return responseObject;
+}
+{{/200}}
+{{#204}}
+if(response.status === 204){
+{{#headers}}
+    return response.headers.get('WWW-Authenticate');
+{{/headers}}
+{{^headers}}
+    return true;
+{{/headers}}
+}
+{{/204}}
+{{#400}}
+else if(response.status === 400){
+    const responseObject = await response.json();
+    responseObject.status = response.status;
+    responseObject.statusText = response.statusText;
+    throw new HttpResponseError(responseObject);
+}
+{{/400}}
+{{#401}}
+else if(response.status === 401){
+    const responseObject = {
+        code: response.status,
+        message: response.headers.get('WWW-Authenticate'),
+        status: response.status,
+        statusText: response.statusText
+    };
+    throw new HttpResponseError(responseObject);
+}
+{{/401}}
+{{#403}}
+else if(response.status === 403){
+    const responseObject = {
+        code: response.status,
+        message: response.statusText,
+        status: response.status,
+        statusText: response.statusText
+    };
+    throw new HttpResponseError(responseObject);
+}
+{{/403}}
+{{#404}}
+else if(response.status === 404){
+    const responseObject = {
+        code: response.status,
+        message: response.statusText,
+        status: response.status,
+        statusText: response.statusText
+    };
+    throw new HttpResponseError(responseObject);
+}
+{{/404}}
+{{#409}}
+else if(response.status === 409){
+    const responseObject = await response.json();
+    responseObject.status = response.status;
+    responseObject.statusText = response.statusText;
+    throw new HttpResponseError(responseObject);
+}
+{{/409}}
+{{#500}}
+else if(response.status === 500){
+    const responseObject = {
+        code: response.status,
+        message: response.statusText,
+        status: response.status,
+        statusText: response.statusText
+    };
+    throw new HttpResponseError(responseObject);
+}
+{{/500}}
+{{/responses}}
+
+};

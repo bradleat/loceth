@@ -1,0 +1,27 @@
+{
+  "name": "api-spec-client-generator",
+  "version": "0.0.1",
+  "description": "A collection of codemods that need to be kept around.",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf build",
+    "postinstall": "yarn link loceth-config"
+  },
+  "author": "Bradley Leatherwood",
+  "devDependencies": {
+    "@types/commander": "^2.3.31",
+    "@types/js-yaml": "^3.5.29",
+    "@types/node": "^6.0.52",
+    "jest": "^18.0.0",
+    "tslint": "^5.2.0",
+    "tslint-eslint-rules": "^4.0.0",
+    "typescript": "^2.3.2"
+  },
+  "dependencies": {
+    "commander": "^2.9.0",
+    "js-yaml": "^3.7.0",
+    "json-refs": "^2.1.6",
+    "swagger-js-codegen": "git://github.com/bradleat/swagger-js-codegen.git#9d4f73a"
+  }
+}

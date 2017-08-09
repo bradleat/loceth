@@ -1,0 +1,186 @@
+swagger: '2.0'
+info:
+  version: '2017-07-15'
+  title: Market API
+  description: The Market API is used to query and set orders on the Loceth order book
+consumes: 
+  - 'application/json'
+produces:
+  - 'application/json'
+schemes:
+  - https
+securityDefinitions:
+  LocethSecurity:
+    type: apiKey
+    in: header
+    name: Authorization
+security:
+  - LocethSecurity: []
+paths:
+  "/market-api/prices":
+    get:
+      operationId: getPrices
+      description: Get the most recent ask and bid prices.
+      responses:
+        '200':
+          description: Prices
+          schema:
+            "$ref": "#/definitions/Prices"
+        '500':
+          description: Internal Server Error
+          schema:
+            "$ref": "#/definitions/Error"
+  "/market-api/listings":
+    get:
+      operationId: getListings
+      description: Get a list of all `Listing`.
+      responses:
+        '200':
+          description: Success
+          schema:
+            title: ArrayOfListings
+            type: array
+            items:
+              "$ref": "#/definitions/ListingWithId"
+        '500':
+          description: Internal Server Error
+          schema:
+            "$ref": "#/definitions/Error"
+    post:
+      operationId: addListing
+      description: Add a new `listing`
+      parameters:
+      - name: body
+        in: body
+        description: The listing
+        required: true
+        schema:
+          "$ref": "#/definitions/Listing"
+      responses:
+        '200':
+          description: Post successful
+          schema:
+            "$ref": "#/definitions/ListingId"
+        '400':
+          description: Bad Request
+          schema:
+            "$ref": "#/definitions/Error"
+        '500':
+          description: Internal Server Error
+  "/market-api/listings/{listingId}":
+    get:
+      operationId: getListing
+      description: Get a `Listing` by its id.
+      parameters:
+      - name: listingId
+        in: path
+        description: listing id
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Get successful
+          schema:
+            "$ref": "#/definitions/ListingWithId"
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          schema:
+            "$ref": "#/definitions/Error"
+    delete:
+      operationId: deleteListing
+      description: Delete a `Listing` by its id.
+      parameters:
+      - name: listingId
+        in: path
+        description: listing id
+        required: true
+        type: string
+      responses:
+        '200':
+          description: Delete successful
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          schema:
+            "$ref": "#/definitions/Error"
+definitions:
+  Listing:
+    type: object
+    properties:
+      account:
+        type: string
+        description: account making the `listing`
+      methods:
+        type: array
+        description: methods for listing
+        items:
+          type: string
+      minSold:
+        type: number
+        description: minimum amount offered
+      maxSold:
+        type: number
+        description: maximum amount offered
+      marketPricePercentage:
+        type: number
+        description: percentage of market price to sell at
+      buying:
+        type: string
+        description: the coin/fiat being bought
+      selling:
+        type: string
+        description: the coin/fiat being sold
+  ListingWithId:
+    type: object
+    properties:
+      id:
+        type: string
+        description: id of the `listing`
+      account:
+        type: string
+        description: account making the `listing`
+      methods:
+        type: array
+        description: methods for listing
+        items:
+          type: string
+      minSold:
+        type: number
+        description: minimum amount offered
+      maxSold:
+        type: number
+        description: maximum amount offered
+      marketPricePercentage:
+        type: number
+        description: percentage of market price to sell at
+      buying:
+        type: string
+        description: the coin/fiat being bought
+      selling:
+        type: string
+        description: the coin/fiat being sold
+  ListingId:
+    type: object
+    properties:
+      id:
+        type: string
+  Prices:
+    type: object
+    properties:
+      ask:
+        type: integer
+        format: int32
+      bid:
+        type: integer
+        format: int32   
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string

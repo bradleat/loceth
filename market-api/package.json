@@ -1,0 +1,41 @@
+{
+  "name": "loceth-market-api",
+  "version": "0.0.1",
+  "description": "A marketplace to power the local purchase of ethereum",
+  "main": "./build/api-services.js",
+  "types": "./build/api-services.d.ts",
+  "server": "./build/index.js",
+  "author": "Bradley Evan Leatherwood",
+  "license": "SEE LICENSE.TXT",
+  "scripts": {
+    "start": "node ./build/index",
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf build",
+    "postinstall": "yarn link loceth-config && (yarn unlink || true) && yarn link"
+  },
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "fetch-ponyfill": "^4.1.0",
+    "gdax": "coinbase/gdax-node",
+    "joi": "^10.6.0",
+    "morgan": "^1.8.2",
+    "uuid": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.16.4",
+    "@types/express": "^4.0.36",
+    "@types/joi": "^10.4.0",
+    "@types/morgan": "^1.7.32",
+    "@types/node": "^7.0.16",
+    "@types/node-fetch": "^1.6.7",
+    "@types/uuid": "^3.4.0",
+    "tslint": "^5.2.0",
+    "tslint-eslint-rules": "^4.0.0",
+    "typescript": "^2.3.4"
+  },
+  "port": 3000,
+  "host": "localhost",
+  "protocol": "http"
+}

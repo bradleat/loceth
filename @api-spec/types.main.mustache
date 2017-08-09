@@ -1,0 +1,8 @@
+{{#imports}}
+import { {{&typeName}} } from '{{&projectName}}/api-types';
+export { {{&typeName}} };
+{{/imports}}
+
+{{#definitions}}
+export type {{&name}} = {{#tsType}}{{> type}}{{/tsType}};
+{{/definitions}}
