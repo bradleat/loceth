@@ -57,7 +57,7 @@ function toProperCase() {
 
 function genServices(project: {name: string, dir: string}, shouldWrite: boolean){
     let name: string | string[] = project.name
-    .replace('trunomi-', '')
+    .replace('loceth.', '')
     .split('-');
 
     name = name.map((part) => {
